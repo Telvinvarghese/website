@@ -2,10 +2,10 @@ name: Daily Commit
 
 on:
   schedule:
-    - cron: '30 0 * * *'  # Runs daily at 00:30 UTC (specific hour & minute)
+    - cron: '0 0 * * *'  # Runs at 00:00 UTC every day
 
 jobs:
-  daily-commit:
+  update-and-push:
     runs-on: ubuntu-latest
 
     permissions:
@@ -13,19 +13,28 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Fetch full history for proper merging
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+      - name: Pull latest changes
+        run: |
+          git pull origin master --rebase || echo "No need to pull"
 
       - name: Make changes
         run: |
-          echo "Daily commit @ $(date)" >> daily_commit.txt
+          echo "Daily commit on $(date)" >> daily_commit.txt
 
-      - name: Commit and Push changes
+      - name: Commit and push changes
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add daily_commit.txt
-          git commit -m "Daily commit on $(date)"
-          git push
+          git add .
+          git commit -m "Daily commit on $(date)" || echo "No changes to commit"
+          git push origin master
 
       - name: Notify 22f2001640@ds.study.iitm.ac.in
-        run: echo "Commit made by GitHub Actions"
+        run: echo "Commit made by GitHub Actions"
