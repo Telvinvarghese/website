@@ -2,7 +2,7 @@ name: Daily Commit
 
 on:
   schedule:
-    - cron: '1 1 * * *'  # Runs at 00:00 UTC every day
+    - cron: '0 0 * * *'  # Runs at 00:00 UTC every day
 
 jobs:
   update-and-push:
@@ -37,4 +37,4 @@ jobs:
           git push origin master
 
       - name: Notify 22f2001640@ds.study.iitm.ac.in
-        run: echo "Commit made by GitHub Actions"
+        run: echo "Commit made by GitHub Actions"
