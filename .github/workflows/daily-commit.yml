@@ -2,7 +2,7 @@ name: Daily Commit
 
 on:
   schedule:
-    - cron: '18 11 * * *'  # Runs at 00:00 UTC every day
+    - cron: '23 11 * * *'  # Runs at 00:00 UTC every day
 
 jobs:
   update-and-push:
@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4  # Updated to latest version
+        uses: actions/checkout@v2
         with:
           fetch-depth: 0  # Fetch full history for proper merging
 
@@ -24,7 +24,7 @@ jobs:
 
       - name: Pull latest changes
         run: |
-          git pull origin main --ff-only || echo "No need to pull"
+          git pull origin main --rebase || echo "No need to pull"
 
       - name: Make changes
         run: |
@@ -36,14 +36,5 @@ jobs:
           git commit -m "Daily commit on $(date)" || echo "No changes to commit"
           git push origin main
 
-      - name: Send Email Notification
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com  # Use your SMTP server
-          server_port: 587
-          username: ${{ secrets.EMAIL_USER }}  # Set in GitHub Secrets
-          password: ${{ secrets.EMAIL_PASS }}  # Set in GitHub Secrets
-          subject: "Daily Commit Successful"
-          body: "A daily commit has been made on $(date)"
-          to: "22f2001640@ds.study.iitm.ac.in"
-          from: "GitHub Actions"
+      - name: Notify 22f2001640@ds.study.iitm.ac.in
+        run: echo "Commit made by GitHub Actions"
