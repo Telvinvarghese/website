@@ -17,7 +17,7 @@ jobs:
 
       - name: Make changes
         run: |
-          echo "Daily commit" >> daily_commit.txt
+          echo "Daily commit @ 00.00" >> daily_commit.txt
 
       - name: Commit changes
         run: |
