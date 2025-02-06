@@ -2,7 +2,7 @@ name: Daily Commit
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # Runs at 00:00 UTC every day
+    - cron: '30 0 * * *'  # Runs daily at 00:30 UTC (specific hour & minute)
 
 jobs:
   daily-commit:
@@ -13,23 +13,19 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Make changes
         run: |
-          echo "Daily commit @ 00.00" >> daily_commit.txt
+          echo "Daily commit @ $(date)" >> daily_commit.txt
 
-      - name: Commit changes
+      - name: Commit and Push changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add daily_commit.txt
-          git commit -m "Daily commit"
-
-      - name: Push changes
-        uses: ad-m/github-push-action@v0.6.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          git commit -m "Daily commit on $(date)"
+          git push
 
       - name: Notify 22f2001640@ds.study.iitm.ac.in
-        run: echo "Commit made by GitHub Actions"
+        run: echo "Commit made by GitHub Actions"
