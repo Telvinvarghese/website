@@ -1,30 +1,42 @@
-name: Deploy to GitHub Pages
+name: Daily Commit
 
 on:
-  push:
-    branches:
-      - main  # ✅ Deploy when pushing to 'main'
-  workflow_dispatch:  # ✅ Allows manual trigger
+  schedule:
+    - cron: '00 0 * * *'  # Runs at 00:00 UTC every day
+  workflow_dispatch:  # Allows manual trigger
+
 
 jobs:
-  deploy:
+  update-and-push:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: write  # ✅ Needed for deployment
+      contents: write
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Fetch full history for proper merging
 
-      - name: Ensure index.html exists
+      - name: Set up Git
         run: |
-          if [ ! -f index.html ]; then
-            echo "<h1>Welcome to GitHub Pages</h1>" > index.html
-          fi
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
 
-      - name: Deploy to GitHub Pages
-        run: echo "GitHub Pages is enabled from the main branch."
+      - name: Pull latest changes
+        run: |
+          git pull origin master --rebase || echo "No need to pull"
 
-      - name: Debugging
-        run: echo "Deployment completed!"
+      - name: Make changes
+        run: |
+          echo "Daily commit on $(date)" >> daily_commit.txt
+
+      - name: Commit and push changes
+        run: |
+          git add .
+          git commit -m "Daily commit on $(date)" || echo "No changes to commit"
+          git push origin main
+
+      - name: 22f2001640@ds.study.iitm.ac.in
+        run: echo "Commit made by GitHub Actions"
