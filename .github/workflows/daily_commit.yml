@@ -1,10 +1,9 @@
-name: Daily Commit
+name: Frequent Commit
 
 on:
   schedule:
-    - cron: '00 0 * * *'  # Runs at 00:00 UTC every day
+    - cron: '*/5 * * * *'  # Runs every 5 minutes
   workflow_dispatch:  # Allows manual trigger
-
 
 jobs:
   update-and-push:
@@ -15,7 +14,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Fetch full history for proper merging
 
@@ -25,18 +24,14 @@ jobs:
           git config --global user.email "github-actions@github.com"
 
       - name: Pull latest changes
-        run: |
-          git pull origin master --rebase || echo "No need to pull"
+        continue-on-error: true
+        run: git pull --rebase || true
 
       - name: Make changes
-        run: |
-          echo "Daily commit on $(date)" >> daily_commit.txt
+        run: echo "Frequent commit on $(date)" >> frequent_commit.txt
 
       - name: Commit and push changes
         run: |
           git add .
-          git commit -m "Daily commit on $(date)" || echo "No changes to commit"
-          git push origin main
-
-      - name: 22f2001640@ds.study.iitm.ac.in
-        run: echo "Commit made by GitHub Actions"
+          git commit -m "Frequent commit on $(date)" || echo "No changes to commit"
+          git push origin main || echo "No changes to push"
