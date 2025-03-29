@@ -3,29 +3,28 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main  # ✅ Trigger deployment on push to 'main'
-  workflow_dispatch:  # ✅ Allow manual trigger
+      - main  # ✅ Deploy when pushing to 'main'
+  workflow_dispatch:  # ✅ Allows manual trigger
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: write  # ✅ Needed for 'gh-pages' push
+      contents: write  # ✅ Needed for deployment
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Deploy to GitHub Pages
+      - name: Ensure index.html exists
         run: |
-          git checkout --orphan gh-pages || git checkout gh-pages
-          git pull origin gh-pages || echo "Creating gh-pages branch"
-          git rm -rf .  # Remove old files
-          mv index.html docs/index.html  # ✅ Move to 'docs' folder (optional)
-          git add index.html
-          git commit -m "Deploy GitHub Pages"
-          git push -f origin gh-pages  # ✅ Force push to update GitHub Pages
+          if [ ! -f index.html ]; then
+            echo "<h1>Welcome to GitHub Pages</h1>" > index.html
+          fi
+
+      - name: Deploy to GitHub Pages
+        run: echo "GitHub Pages is enabled from the main branch."
 
       - name: Debugging
         run: echo "Deployment completed!"
