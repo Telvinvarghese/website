@@ -3,32 +3,29 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main  # ✅ Runs when you push to 'main'
-  workflow_dispatch:  # ✅ Allows manual trigger
+      - main  # ✅ Trigger deployment on push to 'main'
+  workflow_dispatch:  # ✅ Allow manual trigger
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: write  # ✅ Needed for pushing to 'gh-pages'
-    
+      contents: write  # ✅ Needed for 'gh-pages' push
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Git
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
-
       - name: Deploy to GitHub Pages
         run: |
-          git checkout --orphan gh-pages
-          git reset --hard
+          git checkout --orphan gh-pages || git checkout gh-pages
+          git pull origin gh-pages || echo "Creating gh-pages branch"
+          git rm -rf .  # Remove old files
+          mv index.html docs/index.html  # ✅ Move to 'docs' folder (optional)
           git add index.html
           git commit -m "Deploy GitHub Pages"
-          git push -f origin gh-pages  # ✅ Push to 'gh-pages' branch
+          git push -f origin gh-pages  # ✅ Force push to update GitHub Pages
 
       - name: Debugging
         run: echo "Deployment completed!"
